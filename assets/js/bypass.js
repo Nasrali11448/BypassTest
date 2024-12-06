@@ -27,10 +27,10 @@ openLink.addEventListener('click', openPopupLink);
 /* Input validation */
 submitButton.disabled = true;
 bypassInput.addEventListener('input', () => {
-    submitButton.disabled = !isValidUrl(bypassInput.value.trim()) || !getRecaptcha();
+    submitButton.disabled = !isValidUrl(bypassInput.value.trim())
 });
 window.addEventListener('load', () => {
-    submitButton.disabled = !isValidUrl(bypassInput.value.trim()) || !getRecaptcha();
+    submitButton.disabled = !isValidUrl(bypassInput.value.trim())
 });
 
 /* Bypass functions */
@@ -51,10 +51,10 @@ function hidePopup() {
     overlay.style.display = 'none';
 }
 
-async function bypassLink(token) {
+async function bypassLink() {
     submitButton.disabled = true;
     try {
-        const response = await apiRequest(inputLink.value, token);
+        const response = await apiRequest(inputLink.value);
         if (response.status == 'success') {
             inputLink.value = null;
             showPopup(response.result);
@@ -69,31 +69,23 @@ async function bypassLink(token) {
     }
 }
 
-async function apiRequest(link, token) {
-    const recaptcha = getRecaptcha();
+async function apiRequest(link) {
+    const response = await fetch(`https://api.bypass.vip/bypass?url=${encodeURIComponent(link)}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: link }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+
     try {
-        if (!recaptcha) {
-            throw new Error('reCAPTCHA not loaded. Please refresh the page.');
-        }
-
-        const response = await fetch(`https://api.bypass.vip/bypass?url=${encodeURIComponent(link)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                url: link,
-                recaptchaToken: token
-            })
-        });
-
-        return response.json();
+        return await response.json();
     } catch (e) {
-        throw new Error('An error occurred while contacting the API.');
-    } finally {
-        if (recaptcha) {
-            recaptcha.reset();
-        }
+        throw new Error('Invalid JSON response from the server.');
     }
 }
 
