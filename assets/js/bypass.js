@@ -30,7 +30,7 @@ bypassInput.addEventListener('input', () => {
     submitButton.disabled = !isValidUrl(bypassInput.value.trim()) || !getRecaptcha();
 });
 window.addEventListener('load', () => {
-    submitButton.disabled = !isValidUrl(bypassInput.value.trim());
+    submitButton.disabled = !isValidUrl(bypassInput.value.trim()) || !getRecaptcha();
 });
 
 /* Bypass functions */
