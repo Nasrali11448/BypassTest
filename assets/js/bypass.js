@@ -83,7 +83,7 @@ async function apiRequest(link, token) {
             },
             body: JSON.stringify({
                 url: link,
-                recaptchaToken: 'TestToken'
+                recaptchaToken: token
             })
         });
 
